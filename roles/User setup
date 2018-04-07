@@ -1,0 +1,27 @@
+## This playbook creates a users
+---
+- name: Install all users
+  hosts: all
+  become: true
+  vars:
+    admin_group: 'meetup'
+    company_meetup:
+      - name: "Arsi"
+        username: "arsiparsi"
+        keys:
+          active:
+            - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCkR8ozlNYYYwvIAlruBHqt8UUmmDgFWFp+REWwuPq9Dc6P3n8FJbk7UtgATTRJz63qtUPmiz2KHy4ULB3LY+O7zH3kyhPySr7UJQHqag0Lh7fsZYhW6mRTol7FSztDUXrS6Tot4DsOZ7gH0CToB2w2+IflM3ExWUfaUOPUqmYnHvoYz03r4cT9ZcRrmpHva/IboqNeMBg0kEhADskpFw3NWPehdmTIqxRCmjRSMkLXcr/Bu7rS3Yb8HS00ofJekk4FQIG648ha7w20M58Uodtxt44YfsG59D6oFUNEUnY3nH/K+zs6OuqfqesaaFVoFQo9kAihsG69ALWbJ9nutxeL"
+        shell: "/bin/bash"
+        state: present
+  tasks:
+  
+  - name: Add SSH-keys to users
+    authorized_key:
+      user: "{{ item.0.username }}"
+      key: "{{ item.1 }}"
+    with_subelements:
+      - "{{ full_admin_list }}"
+      - keys.active
+      - flags:
+        skip_missing: True
+    when: item.0.state != "absent"
